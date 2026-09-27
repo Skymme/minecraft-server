@@ -1,0 +1,61 @@
+services:
+  mc:
+    # Tag java17 : Forge 1.20.1 recommande Java 17, image multi-arch (amd64 + arm64 pour Oracle Ampere)
+    image: itzg/minecraft-server:java17
+    container_name: mc-atm9sky
+    tty: true
+    stdin_open: true
+    restart: unless-stopped
+    ports:
+      - "25565:25565"
+    environment:
+      EULA: "TRUE"
+      TYPE: AUTO_CURSEFORGE
+      CF_SLUG: all-the-mods-9-to-the-sky
+      # Épingler une version du pack pour que serveur et clients restent identiques
+      CF_FILENAME_MATCHER: ${ATM9_SKY_VERSION:-1.1.9}
+      # CF_API_KEY est optionnel : une clé est intégrée aux images Java 17+
+      CF_API_KEY: ${CF_API_KEY:-}
+      # Mods ajoutés par-dessus le pack (les dépendances ne sont PAS résolues automatiquement)
+      CURSEFORGE_FILES: |
+        minecolonies
+        structurize
+        blockui
+        domum-ornamentum
+      CF_FORCE_SYNCHRONIZE: "true"
+
+      MEMORY: ${MEMORY:-10G}
+      USE_AIKAR_FLAGS: "true"
+
+      MOTD: "ATM9 To the Sky + MineColonies"
+      DIFFICULTY: normal
+      MAX_PLAYERS: 4
+      VIEW_DISTANCE: 8
+      SIMULATION_DISTANCE: 6
+      ALLOW_FLIGHT: "TRUE"
+      ONLINE_MODE: "TRUE"
+      ENABLE_WHITELIST: "TRUE"
+      ENFORCE_WHITELIST: "TRUE"
+      WHITELIST: ${WHITELIST:-}
+      OPS: ${OPS:-}
+
+      ENABLE_RCON: "true"
+      RCON_PASSWORD: ${RCON_PASSWORD:?RCON_PASSWORD doit être défini dans .env}
+    volumes:
+      - ./data:/data
+
+  backups:
+    image: itzg/mc-backup
+    container_name: mc-atm9sky-backup
+    restart: unless-stopped
+    depends_on:
+      - mc
+    environment:
+      RCON_HOST: mc
+      RCON_PASSWORD: ${RCON_PASSWORD}
+      BACKUP_INTERVAL: ${BACKUP_INTERVAL:-6h}
+      PRUNE_BACKUPS_DAYS: ${PRUNE_BACKUPS_DAYS:-7}
+      INITIAL_DELAY: 10m
+    volumes:
+      - ./data:/data:ro
+      - ./backups:/backups

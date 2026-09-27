@@ -1,0 +1,6 @@
+# Secrets
+.env
+
+# Données du serveur (monde, mods téléchargés, logs) et sauvegardes
+data/
+backups/
