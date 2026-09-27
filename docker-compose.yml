@@ -1,8 +1,8 @@
 services:
   mc:
-    # Tag java17 : Forge 1.20.1 recommande Java 17, image multi-arch (amd64 + arm64 pour Oracle Ampere)
-    image: itzg/minecraft-server:java17
-    container_name: mc-atm9sky
+    # Tag java21 : Minecraft 1.21.1 exige Java 21, image multi-arch (amd64 + arm64)
+    image: itzg/minecraft-server:java21
+    container_name: mc-atm10sky
     tty: true
     stdin_open: true
     restart: unless-stopped
@@ -11,9 +11,9 @@ services:
     environment:
       EULA: "TRUE"
       TYPE: AUTO_CURSEFORGE
-      CF_SLUG: all-the-mods-9-to-the-sky
+      CF_SLUG: all-the-mods-10-sky
       # Épingler une version du pack pour que serveur et clients restent identiques
-      CF_FILENAME_MATCHER: ${ATM9_SKY_VERSION:-1.1.9}
+      CF_FILENAME_MATCHER: ${MODPACK_VERSION:-2.0.6}
       # CF_API_KEY est optionnel : une clé est intégrée aux images Java 17+
       CF_API_KEY: ${CF_API_KEY:-}
       # Mods ajoutés par-dessus le pack (les dépendances ne sont PAS résolues automatiquement)
@@ -26,10 +26,10 @@ services:
         towntalk
       CF_FORCE_SYNCHRONIZE: "true"
 
-      MEMORY: ${MEMORY:-10G}
+      MEMORY: ${MEMORY:-12G}
       USE_AIKAR_FLAGS: "true"
 
-      MOTD: "ATM9 To the Sky + MineColonies"
+      MOTD: "ATM10 To the Sky + MineColonies"
       DIFFICULTY: normal
       MAX_PLAYERS: 4
       VIEW_DISTANCE: 8
@@ -45,10 +45,28 @@ services:
       RCON_PASSWORD: ${RCON_PASSWORD:?RCON_PASSWORD doit être défini dans .env}
     volumes:
       - ./data:/data
+    networks:
+      mcnet:
+        # IP fixe : c'est l'adresse locale à renseigner dans le tunnel playit.gg
+        ipv4_address: 172.30.0.10
+
+  # Tunnel playit.gg pour héberger depuis un PC perso sans ouvrir de port.
+  # Activé seulement avec : docker compose --profile playit up -d
+  playit:
+    image: ghcr.io/playit-cloud/playit-agent:0.16
+    container_name: mc-atm10sky-playit
+    profiles: ["playit"]
+    restart: unless-stopped
+    depends_on:
+      - mc
+    environment:
+      SECRET_KEY: ${PLAYIT_SECRET_KEY:-}
+    networks:
+      - mcnet
 
   backups:
     image: itzg/mc-backup
-    container_name: mc-atm9sky-backup
+    container_name: mc-atm10sky-backup
     restart: unless-stopped
     depends_on:
       - mc
@@ -61,3 +79,11 @@ services:
     volumes:
       - ./data:/data:ro
       - ./backups:/backups
+    networks:
+      - mcnet
+
+networks:
+  mcnet:
+    ipam:
+      config:
+        - subnet: 172.30.0.0/24
