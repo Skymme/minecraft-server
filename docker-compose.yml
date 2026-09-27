@@ -22,6 +22,8 @@ services:
         structurize
         blockui
         domum-ornamentum
+        multi-piston
+        towntalk
       CF_FORCE_SYNCHRONIZE: "true"
 
       MEMORY: ${MEMORY:-10G}

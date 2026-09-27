@@ -42,8 +42,9 @@ Chaque joueur doit avoir **exactement** les mêmes versions que le serveur :
 
 1. Installer le launcher CurseForge (ou Prism Launcher).
 2. Installer **All the Mods 9 - To the Sky**, version indiquée dans `ATM9_SKY_VERSION`.
-3. Ajouter au profil : **MineColonies**, **Structurize**, **BlockUI**, **Domum Ornamentum**
-   (versions 1.20.1 Forge — les mêmes que dans `data/mods/` sur le serveur).
+3. Ajouter au profil : **MineColonies**, **Structurize**, **BlockUI**, **Domum Ornamentum**,
+   **Multi-Piston**, **TownTalk** (versions 1.20.1 Forge — les mêmes que dans `data/mods/`
+   sur le serveur).
 4. Allouer au moins 8 Go de RAM au jeu.
 5. Se connecter à `IP_DU_SERVEUR:25565`.
 
